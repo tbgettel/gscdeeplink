@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Link Generator</title>
+</head>
+<body>
+    <h1>Deep Link Generator</h1>
+
+    <!-- Base URL Section -->
+    <label for="base-url">Base URL/Path:</label>
+    <input type="text" id="base-url" value="gospotcheck://companies/{id}/missions/{id}/places/{id}/mission_responses/?start=true" readonly>
+    <br><br>
+
+    <!-- Customer Data Section -->
+    <label for="customer-data">Customer Data (JSON):</label>
+    <textarea id="customer-data" rows="5" cols="40" placeholder='{"visit_id":"678345","task_id":"abc123"}'></textarea>
+    <br>
+    <button onclick="encodeCustomerData()">Validate & Encode Customer Data</button>
+    <p id="encoded-customer-data"></p>
+    <br>
+
+    <!-- Completion Trigger Section -->
+    <label for="completion-trigger">Completion Trigger (JSON):</label>
+    <textarea id="completion-trigger" rows="5" cols="40" placeholder='{"action_type":"url_redirect","value":"salesforce1://some_url","mx_options":["status","mx_user_id"]}'></textarea>
+    <br>
+    <button onclick="encodeCompletionTrigger()">Validate & Encode Completion Trigger</button>
+    <p id="encoded-completion-trigger"></p>
+    <br>
+
+    <!-- Final Deep Link Preview -->
+    <h2>Final Deep Link</h2>
+    <p id="final-deep-link"></p>
+
+    <script>
+        function encodeCustomerData() {
+            const customerData = document.getElementById("customer-data").value;
+
+            // Validate JSON
+            try {
+                JSON.parse(customerData);
+                // Encode JSON
+                const encodedData = encodeURIComponent(customerData);
+                document.getElementById("encoded-customer-data").innerText = `Encoded Customer Data: ${encodedData}`;
+                updateFinalLink();
+            } catch (e) {
+                alert("Invalid JSON in Customer Data");
+            }
+        }
+
+        function encodeCompletionTrigger() {
+            const completionTrigger = document.getElementById("completion-trigger").value;
+
+            // Validate JSON
+            try {
+                JSON.parse(completionTrigger);
+                // Encode JSON
+                const encodedTrigger = encodeURIComponent(completionTrigger);
+                document.getElementById("encoded-completion-trigger").innerText = `Encoded Completion Trigger: ${encodedTrigger}`;
+                updateFinalLink();
+            } catch (e) {
+                alert("Invalid JSON in Completion Trigger");
+            }
+        }
+
+        function updateFinalLink() {
+            const baseUrl = document.getElementById("base-url").value;
+            const encodedCustomerData = document.getElementById("encoded-customer-data").innerText.split(": ")[1];
+            const encodedCompletionTrigger = document.getElementById("encoded-completion-trigger").innerText.split(": ")[1];
+
+            if (encodedCustomerData && encodedCompletionTrigger) {
+                const finalLink = `${baseUrl}&customer_data=${encodedCustomerData}&completion_trigger=${encodedCompletionTrigger}`;
+                document.getElementById("final-deep-link").innerText = `Deep Link: ${finalLink}`;
+            }
+        }
+    </script>
+
+</body>
+</html>
